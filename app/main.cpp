@@ -600,9 +600,11 @@ int main(int argc, char *argv[])
     // Let us see the true VBlank rather than DWM's approximation. We do this here
     // because this API must be called before the first swapchain (which Qt will
     // create when the window is displayed). This is supported on Win11 22H2+.
+    typedef HRESULT(WINAPI* PFN_DXGIDisableVBlankVirtualization)(void);
     auto fnDXGIDisableVBlankVirtualization =
-        (decltype(DXGIDisableVBlankVirtualization)*)GetProcAddress(GetModuleHandleW(L"dxgi.dll"),
-                                                                   "DXGIDisableVBlankVirtualization");
+        reinterpret_cast<PFN_DXGIDisableVBlankVirtualization>(
+            GetProcAddress(GetModuleHandleW(L"dxgi.dll"),
+                           "DXGIDisableVBlankVirtualization"));
     if (fnDXGIDisableVBlankVirtualization) {
         fnDXGIDisableVBlankVirtualization();
     }
